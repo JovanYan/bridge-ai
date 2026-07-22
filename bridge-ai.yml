@@ -1,0 +1,302 @@
+app:
+  description: Translate messages between business roles and engineers
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  icon_type: emoji
+  mode: workflow
+  name: Bridge AI
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/deepseek:0.0.19@5b68617c637b62d31e7f33a9f5677b76e88f81868fb04a728e208588564b72ea
+    version: null
+kind: app
+version: 0.6.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 50
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: llm
+      id: 1784629169079-source-1784629526600-target
+      selected: false
+      source: '1784629169079'
+      sourceHandle: source
+      target: '1784629526600'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: template-transform
+      id: 1784629526600-source-1784634263495-target
+      source: '1784629526600'
+      sourceHandle: source
+      target: '1784634263495'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: template-transform
+        targetType: end
+      id: 1784634263495-source-1784629838799-target
+      source: '1784634263495'
+      sourceHandle: source
+      target: '1784629838799'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        selected: false
+        title: 用户输入
+        type: start
+        variables:
+        - hint: ''
+          label: Source Role / 说话人角色
+          options:
+          - Product Manager
+          - Engineer
+          - Marketing
+          - Customer Success
+          - Sales
+          placeholder: ''
+          required: true
+          type: select
+          variable: source_role
+        - hint: ''
+          label: Target Role / 目标角色
+          options:
+          - Product Manager
+          - Engineer
+          - Marketing
+          - Sales
+          - Customer Success
+          placeholder: ''
+          required: true
+          type: select
+          variable: target_role
+        - default: ''
+          hint: ''
+          label: Message / 原始内容
+          max_length: 2000
+          options: []
+          placeholder: ''
+          required: true
+          type: paragraph
+          variable: message
+      height: 161
+      id: '1784629169079'
+      position:
+        x: 80
+        y: 282
+      positionAbsolute:
+        x: 80
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.3
+          mode: chat
+          name: deepseek-v4-flash
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: 9d816ec5-3568-44c5-81f2-86109233a286
+          role: system
+          text: "You are a professional cross-functional communication translator\
+            \ inside a company.\n\nYour job: rewrite a message from one role so that\
+            \ another role can immediately understand it.\n\nYou will receive:\n-\
+            \ SOURCE_ROLE: who wrote the message\n- TARGET_ROLE: who will read it\n\
+            - MESSAGE: the original content\n\nTranslation rules:\n1. Preserve the\
+            \ original intent completely. Never add new requirements or drop information.\n\
+            2. Never invent specific numeric targets that are not in the original\
+            \ message. If quantification would help, say \"suggest setting a measurable\
+            \ target (to be defined by the engineering team)\" instead.\n3. Adjust\
+            \ vocabulary and abstraction level to the TARGET_ROLE:\n   - Engineer:\
+            \ use precise technical terms, metrics and implementation hints (e.g.\
+            \ FCP, lazy loading, API, SSE).\n   - Product Manager: use feature, user-value\
+            \ and priority language.\n   - Marketing / Sales: use benefit, customer-value\
+            \ and differentiation language. No jargon.\n   - Customer Success: use\
+            \ empathetic, customer-scenario language.\n4. When translating FROM technical\
+            \ language TO a non-technical role, briefly explain what it means for\
+            \ the user experience, using one concrete example.\n5. When translating\
+            \ FROM vague business language TO Engineer, convert it into actionable\
+            \ technical directions.\n6. When the message lacks specifics, still faithfully\
+            \ translate everything it contains (including business motivation and\
+            \ actionable technical directions where applicable), then list what additional\
+            \ details would help the TARGET_ROLE execute better (e.g. scope, timeline,\
+            \ success criteria). Only when the message contains almost no translatable\
+            \ content should you respond primarily with a clarification request.\n\
+            7. You may suggest technical directions as reference, but never make architecture\
+            \ or technology-stack decisions on behalf of the engineer. Phrase any\
+            \ suggestion as an optional direction for the engineering team to evaluate.\n\
+            8. Match the language of the original message (Chinese in → Chinese out,\
+            \ English in → English out).\n9. Output in exactly this structure, nothing\
+            \ else:\n\n【翻译】\n(the translated message)\n\n【术语解释】\n(explain up to 3\
+            \ key terms from your translation that the TARGET_ROLE might not know,\
+            \ one per line, format: term — explanation. If none needed, write: 无需解释)\n\
+            \nThe section headers 【翻译】 and 【术语解释】 must appear verbatim in your output."
+        - id: 6ca98814-1d0a-41de-b745-e9b9db9b6c5c
+          role: user
+          text: 'SOURCE_ROLE: {{#1784629169079.source_role#}}
+
+            TARGET_ROLE: {{#1784629169079.target_role#}}
+
+            MESSAGE:
+
+            {{#1784629169079.message#}}'
+        selected: false
+        title: LLM
+        type: llm
+        vision:
+          enabled: false
+      height: 88
+      id: '1784629526600'
+      position:
+        x: 382
+        y: 282
+      positionAbsolute:
+        x: 382
+        y: 282
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        outputs:
+        - value_selector:
+          - '1784634263495'
+          - output
+          value_type: string
+          variable: output
+        selected: false
+        title: 输出
+        type: end
+      height: 88
+      id: '1784629838799'
+      position:
+        x: 983.0185672599782
+        y: 282
+      positionAbsolute:
+        x: 983.0185672599782
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        selected: false
+        template: '📋 角色翻译报告
+
+          {{source_role}} ➜ {{target_role}}
+
+          ━━━━━━━━━━━━━━
+
+          {{translation}}
+
+          ━━━━━━━━━━━━━━
+
+          由 Business-Tech Translator 生成'
+        title: 模板转换
+        type: template-transform
+        variables:
+        - value_selector:
+          - '1784629169079'
+          - source_role
+          value_type: string
+          variable: source_role
+        - value_selector:
+          - '1784629169079'
+          - target_role
+          value_type: string
+          variable: target_role
+        - value_selector:
+          - '1784629526600'
+          - text
+          value_type: string
+          variable: translation
+      height: 52
+      id: '1784634263495'
+      position:
+        x: 684
+        y: 282
+      positionAbsolute:
+        x: 684
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    viewport:
+      x: -720.1600948220953
+      y: 19.98551704867606
+      zoom: 1.0245843035316686
+  rag_pipeline_variables: []
